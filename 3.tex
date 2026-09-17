@@ -1,30 +1,93 @@
 \section{Практичне використання криптографічних бібліотек}
 \subsection{Симетричне автентифіковане шифрування}
 
+Встановлення бібліотеки.
+\begin{lstlisting}[language=Python]
+import os
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+from cryptography.exceptions import InvalidTag
+\end{lstlisting}
+
 \subsubsection{Генерація криптографічно стійкого ключа}
 
-% Код та результат
-
 \begin{lstlisting}[language=Python]
-# Bude cod 
+key = AESGCM.generate_key(bit_length=256)
+aesgcm = AESGCM(key)
+
+message = b"Hello, my name is Mariia"
 \end{lstlisting}
 
 \subsubsection{Шифрування тестового повідомлення}
 
-% Код та результат
+\begin{lstlisting}[language=Python]
+nonce = os.urandom(12)
+ciphertext = aesgcm.encrypt(nonce, message, None)
+
+print("Message:", message)
+print("Key:", key.hex())
+print("Nonce:", nonce.hex())
+print("Ciphertext:", ciphertext.hex())
+
+\end{lstlisting}
 
 \subsubsection{Розшифрування повідомлення}
 
-% Код та результат
+\begin{lstlisting}[language=Python]
+decrypted = aesgcm.decrypt(nonce, ciphertext, None)
+
+print("\nDecrypted message:", decrypted)
+\end{lstlisting}
 
 \subsubsection{Перевірка цілісності після зміни шифротексту}
 
-% Код та результат
+\begin{lstlisting}[language=Python]
+modified_ciphertext = bytearray(ciphertext)
+modified_ciphertext[0] ^= 1
+modified_ciphertext = bytes(modified_ciphertext)
+
+print("\nModified ciphertext:", modified_ciphertext.hex())
+
+try:
+    aesgcm.decrypt(nonce, modified_ciphertext, None)
+    print("Decryption successful")
+except InvalidTag:
+    print("Error: authentication tag verification failed")
+\end{lstlisting}
+
+\subsubsection{Вивід}
+У результаті виконання програми було згенеровано 256-бітний ключ, 12-байтовий nonce та отримано шифротекст тестового повідомлення.
+
+\begin{lstlisting}[language=Python]
+Message: b'Hello, my name is Mariia'
+Key: fc5febdc3df5cd09ecb790ebea5651e7dd441783d988c1e643e58acc8db8f25d
+Nonce: 9f72c8ca0d7e717102b1c728
+Ciphertext: 1e256814693b724c81fb72b20cb1ee6bcae3db883a2a5fb36416e6af01e720ed626effe2d343afd2
+
+Decrypted message: b'Hello, my name is Mariia'
+
+Modified ciphertext: 1f256814693b724c81fb72b20cb1ee6bcae3db883a2a5fb36416e6af01e720ed626effe2d343afd2
+Error: authentication tag verification failed
+\end{lstlisting}
+
+Після зміни одного байта шифротексту його розшифрування завершилося помилкою InvalidTag. Це свідчить про виявлення порушення цілісності зашифрованих даних.
 
 \subsubsection{Призначення ключа, nonce та authentication tag}
 
-% Пояснення
+У використаному алгоритмі AES-GCM ключ є секретним значенням, за допомогою якого виконується шифрування 
+та розшифрування повідомлення. У цьому прикладі використовується ключ довжиною 256 біт.
 
+Nonce --- це значення, яке використовується разом із ключем під час шифрування. 
+У нашому випадку nonce має довжину 12 байт (Для AES-GCM рекомендована довжина nonce становить 12 байт (96 біт))
+і генерується за допомогою криптографічно стійкого генератора випадкових чисел.
+Для AES-GCM важливо, щоб nonce не повторювався при використанні одного й того самого ключа. 
+Повторне використання nonce з тим самим ключем є небезпечним, оскільки може призвести до розкриття інформації про відкритий текст та порушення автентифікаційного захисту. 
+Тому для кожного нового повідомлення необхідно використовувати новий nonce.
+
+Authentication tag --- це тег, який генерується під час шифрування та використовується для 
+перевірки цілісності й автентичності шифротексту. У використаній бібліотеці він формується автоматично.
+
+Після зміни одного байта шифротексту перевірка authentication tag не проходить, тому виникає  \texttt{InvalidTag}. 
+Це показує,що AES-GCM забезпечує не тільки конфіденційність даних, а й перевірку їх цілісності.
 
 \subsection{Цифровий підпис}
 
