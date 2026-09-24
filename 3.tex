@@ -91,23 +91,84 @@ Authentication tag --- це тег, який генерується під ча�
 
 \subsection{Цифровий підпис}
 
-\subsubsection{Генерація ключової пари}
+Для практичної демонстрації створення та перевірки цифрового підпису використано алгоритм на основі скрученої кривої Едвардса --- Ed25519 (схема EdDSA). Він забезпечує високу швидкодію, стійкість до атак за часом виконання та фіксовану довжину підпису (64 байти) і відкритого ключа (32 байти).
 
-% Код та результат
-
+Імпорт необхідних модулів:
 \begin{lstlisting}[language=Python]
-# Bude cod 
+from cryptography.hazmat.primitives.asymmetric import ed25519
+from cryptography.hazmat.primitives import serialization
+from cryptography.exceptions import InvalidSignature
 \end{lstlisting}
 
+\subsubsection{Генерація ключової пари}
+
+\begin{lstlisting}[language=Python]
+private_key = ed25519.Ed25519PrivateKey.generate()
+public_key = private_key.public_key()
+
+pub_bytes = public_key.public_bytes(
+    encoding=serialization.Encoding.Raw,
+    format=serialization.PublicFormat.Raw
+)
+
+message = b"Hello, my name is Mariia"
+
+print("Private key: generated (held in memory, not exported)")
+print("Public key (raw hex):", pub_bytes.hex())
+print("Original message:", message)
+\end{lstlisting}
 
 \subsubsection{Створення цифрового підпису}
 
-% Код та результат
+\begin{lstlisting}[language=Python]
+signature = private_key.sign(message)
+
+print("\nSignature (hex):", signature.hex())
+print("Signature length:", len(signature), "bytes")
+\end{lstlisting}
 
 \subsubsection{Перевірка цифрового підпису}
 
-% Код та результат
+\begin{lstlisting}[language=Python]
+try:
+    public_key.verify(signature, message)
+    print("Verification result: Signature is VALID")
+except InvalidSignature:
+    print("Verification result: Signature is INVALID")
+\end{lstlisting}
 
 \subsubsection{Перевірка підпису після зміни повідомлення}
 
-% Код та результат
+\begin{lstlisting}[language=Python]
+modified_message = b"Hello, my name is Mariia!"
+
+print("\nModified message:", modified_message)
+
+try:
+    public_key.verify(signature, modified_message)
+    print("Verification result: Signature is VALID")
+except InvalidSignature:
+    print("Verification result: Signature verification FAILED (InvalidSignature)")
+\end{lstlisting}
+
+\subsubsection{Вивід}
+
+У результаті виконання коду було згенеровано пару ключів Ed25519, обчислено цифровий підпис вихідного повідомлення та успішно верифіковано його за допомогою відкритого ключа.
+
+\begin{lstlisting}[language=bash]
+Private key: generated (held in memory, not exported)
+Public key (raw hex): 25aed4306658c129d87a34fff7b6497f09f3c8e30a5f694f69912c5b1ff45b88
+Original message: b'Hello, my name is Mariia'
+
+Signature (hex): 9b304a2c75ea4b89fffab3bd995d40930b295f1d012d4b279aaab3906b560ea6a3edc889198a5a15
+    454d2bd50b86103e060d23edafcda683ad5e48d3ccb44504
+Signature length: 64 bytes
+Verification result: Signature is VALID
+
+Modified message: b'Hello, my name is Mariia!'
+Verification result: Signature verification FAILED (InvalidSignature)
+\end{lstlisting}
+
+\subsubsection{Призначення ключів та цифрового підпису}
+
+У криптосистемі Ed25519 закритий ключ є секретним і застосовується виключно для накладання цифрового підпису, тоді як відкритий ключ поширюється вільно та дозволяє будь-якій стороні перевірити справжність документа. Цифровий підпис фіксованого розміру (64 байти) підтверджує авторство відправника та незмінність даних. Модифікація навіть одного знака у повідомленні (додавання знака оклику) призвела до завершення перевірки винятком \texttt{InvalidSignature}, що підтверджує надійне виявлення спотворення підписаних даних.
