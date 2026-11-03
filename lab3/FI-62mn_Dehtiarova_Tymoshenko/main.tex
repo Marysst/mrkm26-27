@@ -12,7 +12,7 @@
 ]{geometry}
 \usepackage{setspace}
 \onehalfspacing
-
+\usepackage{indentfirst}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{array}
@@ -22,13 +22,20 @@
 \usepackage{xcolor}
 
 \lstset{
+    language=Python,
     inputencoding=utf8,
     extendedchars=true,
     basicstyle=\ttfamily\small,
     breaklines=true,
     frame=single,
     columns=fullflexible,
-    keepspaces=true
+    showspaces=false,
+    showstringspaces=false,
+    keywordstyle=\color{blue},
+    stringstyle=\color{green!50!black},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    numbersep=8pt
 }
 
 \usepackage{graphicx}
@@ -53,15 +60,15 @@
 \vspace{2cm}
 
 {\large ЗВІТ}\\
-{\large ДО ЛАБОРАТОРНОЇ РОБОТИ №1}
+{\large ДО ЛАБОРАТОРНОЇ РОБОТИ №3}
 
 \vspace{1cm}
 
-{\large на тему:}
+{\large на тему: «Реалізація основних асиметричних криптосистем»}
 
 \vspace{0.5cm}
 
-\textbf{«Вибір та реалізація базових фреймворків та бібліотек»}
+\textbf{}
 
 \end{center}
 
@@ -94,6 +101,8 @@
 \input{3.tex}
 \input{4.tex}
 \input{5.tex}
+\input{6.tex}
+\input{7.tex}
 
 
 \section*{Висновки}
@@ -106,14 +115,36 @@
 \addcontentsline{toc}{section}{Перелік використаних джерел}
 
 % Тут будуть джерела
-\begin{enumerate}
+\begin{thebibliography}{99} 
 
-\item
-Шось .
-\textit{Щось}.
-\\
-\url{https://shos.tex}
+    \bibitem{RFC8017}
+    Moriarty, K., Kaliski, B., Jonsson, J., Rusch, A.
+    \textit{PKCS \#1: RSA Cryptography Specifications Version 2.2}.
+    RFC 8017, 2016.
+    \\
+    \url{https://www.rfc-editor.org/rfc/rfc8017}
 
-\end{enumerate}
+    \bibitem{RFC8032}
+    Josefsson, S., Liusvaara, I.
+    \textit{Edwards-Curve Digital Signature Algorithm (EdDSA)}.
+    RFC 8032, 2017.
+    \\
+    \url{https://www.rfc-editor.org/rfc/rfc8032}
+
+    \bibitem{RFC7748}
+    Langley, A., Hamburg, M., Turner, S.
+    \textit{Elliptic Curves for Security}.
+    RFC 7748, 2016.
+    \\
+    \url{https://www.rfc-editor.org/rfc/rfc7748}
+
+    \bibitem{NIST80057}
+    Barker, E.
+    \textit{Recommendation for Key Management: Part 1 -- General}.
+    NIST Special Publication 800-57 Part 1, Revision 5, 2020.
+    \\
+    \url{https://doi.org/10.6028/NIST.SP.800-57pt1r5}
+
+\end{thebibliography}
 
 \end{document}
